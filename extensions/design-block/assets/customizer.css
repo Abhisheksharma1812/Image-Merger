@@ -1,0 +1,16 @@
+.image-merger{
+display:flex;
+gap:30px;
+}
+
+.left-panel{
+width:300px;
+}
+
+.right-panel{
+flex:1;
+}
+
+canvas{
+border:1px solid #ddd;
+}

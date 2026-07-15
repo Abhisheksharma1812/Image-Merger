@@ -1,0 +1,20 @@
+{% assign custom_design_image = line_item.properties['Custom Design Image'] %}
+{% assign custom_design_text = line_item.properties['Custom Design'] %}
+
+{% if custom_design_image != blank %}
+  <div class="custom-design-cart" style="margin-top: 10px;">
+    <p style="margin: 0 0 6px 0;"><strong>Custom Design</strong></p>
+    <img
+      src="{{ custom_design_image }}"
+      alt="Custom design for {{ line_item.title }}"
+      style="max-width: 140px; border-radius: 8px; display: block;"
+    />
+    {% if custom_design_text != blank %}
+      <p style="margin: 6px 0 0 0; font-size: 12px;">{{ custom_design_text }}</p>
+    {% endif %}
+  </div>
+{% else %}
+  <div class="custom-design-cart" style="margin-top: 10px; font-size: 12px; color: #666;">
+    No custom image captured for this item.
+  </div>
+{% endif %}

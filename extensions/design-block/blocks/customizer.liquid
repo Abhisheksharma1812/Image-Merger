@@ -1,0 +1,109 @@
+{{ 'customizer.css' | asset_url | stylesheet_tag }}
+
+<script>
+window.productCustomizer = {
+  productId: {{ product.id | json }},
+  title: {{ product.title | json }},
+  images: [
+    {% for image in product.images %}
+      {{ image | image_url: width: 1200 | json }}{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ]
+};
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+<script src="{{ 'customizer.js' | asset_url }}" defer></script>
+
+<div class="image-merger">
+
+    <!-- Left Controls -->
+    <div class="left-panel">
+
+        <h3>Product Customizer</h3>
+
+        <div class="control-group">
+            <label>View</label>
+
+            <div class="view-buttons">
+                <button type="button" id="frontView">Front</button>
+                <button type="button" id="backView">Back</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="uploadImage">Upload Logo</label>
+
+            <input
+                type="file"
+                id="uploadImage"
+                accept="image/png,image/jpeg,image/jpg,image/webp">
+        </div>
+
+        <div class="control-group">
+            <label for="customText">Custom Text</label>
+
+            <input
+                type="text"
+                id="customText"
+                placeholder="Enter your text">
+        </div>
+
+        <div class="control-group">
+            <label for="textColor">Text Color</label>
+
+            <input
+                type="color"
+                id="textColor"
+                value="#000000">
+        </div>
+
+        <div class="control-group buttons">
+
+            <button
+                type="button"
+                id="addText">
+                Add Text
+            </button>
+
+            <button
+                type="button"
+                id="deleteObject">
+                Delete Selected
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Right Preview -->
+    <div class="right-panel">
+
+        <canvas
+            id="designCanvas"
+            width="600"
+            height="700">
+        </canvas>
+
+    </div>
+
+</div>
+
+<input type="hidden" name="properties[Custom Design]" value="">
+<input type="hidden" name="properties[Custom Design Image]" value="">
+<input type="hidden" name="properties[Designer]" value="Image Merger">
+
+{% schema %}
+{
+  "name": "Product Customizer",
+  "target": "section",
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Product",
+      "autofill": true
+    }
+  ]
+}
+{% endschema %}
