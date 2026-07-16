@@ -36,10 +36,39 @@ cloudinary.config({
 /**
  * Upload a browser File object to Cloudinary.
  */
+const streamToBuffer = (stream) =>
+  new Promise((resolve, reject) => {
+    const chunks = [];
+    stream.on("data", (c) => chunks.push(Buffer.isBuffer(c) ? c : Buffer.from(c)));
+    stream.on("end", () => resolve(Buffer.concat(chunks)));
+    stream.on("error", reject);
+  });
+
 const uploadToCloudinary = async (file, folder = "shopify-designs") => {
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const fileName = file.name || "design";
-  const baseName = fileName.replace(/\.[^.]+$/, "") || "design";
+  let buffer;
+  let fileName = "design";
+
+  if (!file) throw new Error("No file provided");
+
+  if (typeof file.arrayBuffer === "function") {
+    buffer = Buffer.from(await file.arrayBuffer());
+    fileName = file.name || file.filename || fileName;
+  } else if (Buffer.isBuffer(file)) {
+    buffer = file;
+  } else if (file.buffer) {
+    buffer = Buffer.isBuffer(file.buffer) ? file.buffer : Buffer.from(file.buffer);
+    fileName = file.name || file.filename || fileName;
+  } else if (file.stream) {
+    buffer = await streamToBuffer(file.stream);
+    fileName = file.name || file.filename || fileName;
+  } else if (typeof file === "string") {
+    // base64 or filepath is not supported here
+    throw new Error("Unsupported file format: string provided");
+  } else {
+    throw new Error("Unsupported file type for upload");
+  }
+
+  const baseName = (fileName || "design").replace(/\.[^.]+$/, "") || "design";
 
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
@@ -80,7 +109,7 @@ export async function action({ request }) {
     const file = formData.get("file");
     const folder = formData.get("folder")?.toString() || "shopify-designs";
 
-    if (!(file instanceof File)) {
+    if (!file) {
       return json({ success: false, message: "No file content processed" }, { status: 400 });
     }
 
