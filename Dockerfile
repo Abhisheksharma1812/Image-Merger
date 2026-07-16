@@ -15,4 +15,4 @@ COPY . .
 
 RUN npm run build
 
-CMD ["npm", "run", "docker-start"]
+CMD ["sh", "-lc", "if [ \"$RUN_MIGRATE\" = \"1\" ]; then npm run setup; fi; npm run start"]
