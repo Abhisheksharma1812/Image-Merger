@@ -13,6 +13,9 @@ RUN npm ci --omit=dev && npm cache clean --force
 
 COPY . .
 
+# Ensure Prisma client is generated at build time so @prisma/client is ready at runtime
+RUN npx prisma generate
+
 RUN npm run build
 
 CMD ["sh", "-lc", "if [ \"$RUN_MIGRATE\" = \"1\" ]; then npm run setup; fi; npm run start"]
